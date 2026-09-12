@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Таблица пропусков группы в Google Sheets.">
+    <title>Таблица пропусков | Компьютерная Инженерия</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/main.js" defer></script>
+</head>
+<body data-page="schedule">
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html"><img class="brand-logo" src="assets/logo.jpg" alt="Логотип Компьютерной Инженерии"><span data-portal-name>Компьютерная Инженерия</span></a>
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Меню</button>
+            <nav id="site-nav" class="site-nav" aria-label="Основная навигация">
+                <a href="index.html" data-nav="home">Главная</a>
+                <a href="schedule.html" data-nav="schedule">Таблица пропусков</a>
+                <a href="zoom.html" data-nav="zoom">Zoom</a>
+                <a href="classroom.html" data-nav="classroom">Google Classroom</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container page-content">
+        <section class="page-heading">
+            <p class="eyebrow">Учёт посещаемости</p>
+            <h1>Таблица пропусков</h1>
+            <p>Таблица пропусков группы в Google Sheets.</p>
+        </section>
+        <section class="viewer-panel">
+            <div class="viewer-toolbar"><span class="status-dot"></span><span>Таблица только для просмотра</span></div>
+            <div id="docs-fallback" class="fallback" hidden>
+                <strong>Предварительный просмотр недоступен.</strong>
+                <p>Откройте таблицу напрямую в Google Sheets.</p>
+                <a class="button button-primary" data-google-docs-link target="_blank" rel="noopener noreferrer">Открыть Google Sheets</a>
+            </div>
+            <iframe id="docs-frame" title="Расписание в Google Docs" loading="lazy"></iframe>
+        </section>
+        <a class="button button-primary" data-google-docs-link target="_blank" rel="noopener noreferrer">Открыть в Google Sheets</a>
+    </main>
+
+    
+</body>
+</html>
