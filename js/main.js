@@ -9,7 +9,8 @@ const PORTAL_CONFIG = {
 const quickLinks = [
     { logo: 'https://cdn.simpleicons.org/googlesheets/34A853', title: 'Таблица пропусков', button: 'Открыть таблицу', description: 'Открыть таблицу пропусков группы.', href: 'schedule.html' },
     { logo: 'https://cdn.simpleicons.org/zoom/2D8CFF', title: 'Zoom', button: 'Открыть Zoom', description: 'Ссылки на онлайн-занятия в Zoom.', href: 'zoom.html' },
-    { logo: 'https://cdn.simpleicons.org/googleclassroom/0F9D58', title: 'Google Classroom', button: 'Открыть Classroom', description: 'Онлайн-занятия и учебные материалы.', href: 'classroom.html' }
+    { logo: 'https://cdn.simpleicons.org/googleclassroom/0F9D58', title: 'Google Classroom', button: 'Открыть Classroom', description: 'Онлайн-занятия и учебные материалы.', href: 'classroom.html' },
+    { logo: 'https://cdn.simpleicons.org/telegram/229ED9', title: 'Группа в Telegram', button: 'Открыть группу', description: 'Общение и важные объявления группы.', href: 'https://t.me/+4MD5h8O5blszYThi', external: true }
 ];
 
 document.body.classList.add('page-loading');
@@ -91,7 +92,7 @@ function renderQuickLinks() {
             <span class="card-icon"><img class="card-logo" src="${link.logo}" alt="Логотип ${link.title}"></span>
             <h3>${link.title}</h3>
             <p>${link.description}</p>
-            <a class="button" href="${link.href}">${link.button}</a>
+            <a class="button" href="${link.href}"${link.external ? ' target="_blank" rel="noopener noreferrer"' : ''}>${link.button}</a>
         </article>
     `).join('');
 }
