@@ -59,6 +59,15 @@
                     <select name="section" aria-label="Раздел"><option value="zoom">Zoom</option><option value="classroom">Google Classroom</option><option value="telegram">Telegram</option></select><input name="name" placeholder="Название" required><input name="teacher" placeholder="Преподаватель"><input name="description" placeholder="Описание" required><input name="url" type="url" placeholder="Ссылка"><button class="button button-primary" type="submit">Добавить ресурс</button>
                 </form>
             </section>
+
+            <section class="admin-section">
+                <div class="admin-section-heading"><div><p class="eyebrow">Доступ</p><h2>Администраторы</h2></div></div>
+                <div id="admins-list" class="admin-list"></div>
+                <form id="admin-user-form" class="admin-form admin-grid-form admin-add-form">
+                    <input name="email" type="email" placeholder="Email пользователя" autocomplete="email" required>
+                    <button class="button button-primary" type="submit">Добавить администратора</button>
+                </form>
+            </section>
         </section>
     </main>
 </body>

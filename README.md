@@ -30,10 +30,11 @@ PDF доступен только для просмотра. На главной
 1. Создайте проект на [Supabase](https://supabase.com/).
 2. Откройте SQL Editor и выполните содержимое `supabase-schema.sql`.
 3. В разделе Authentication создайте пользователя с email и паролем.
-4. Добавьте UUID пользователя в таблицу `admin_users`: `insert into public.admin_users (user_id) values ('UUID_ПОЛЬЗОВАТЕЛЯ');`.
-5. Вставьте Project URL и **publishable/anon key** в `js/supabase-config.js`.
-6. Включите Realtime для таблиц `site_settings`, `quick_links` и `resources`.
-7. Откройте `/admin.html` на опубликованном сайте и войдите.
+4. Войдите в админ-панель под первым пользователем, которому добавили права вручную через SQL, либо через `insert into public.admin_users (user_id) values ('UUID_ПОЛЬЗОВАТЕЛЯ');`.
+5. После входа в админ-панель откройте раздел «Администраторы» и добавьте нужные email-адреса. Для этого система ищет существующих пользователей в Auth и назначает им права администратора.
+6. Вставьте Project URL и **publishable/anon key** в `js/supabase-config.js`.
+7. Включите Realtime для таблиц `site_settings`, `quick_links` и `resources`.
+8. Откройте `/admin.html` на опубликованном сайте и войдите.
 
 Публичный ключ можно хранить в GitHub: доступ ограничивается политиками RLS. Никогда не добавляйте в репозиторий `service_role` key, пароли или другие секретные ключи.
 

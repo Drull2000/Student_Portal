@@ -19,6 +19,7 @@ async function initializeAdmin() {
     document.getElementById('settings-form').addEventListener('submit', saveSettings);
     document.getElementById('quick-link-form').addEventListener('submit', addQuickLink);
     document.getElementById('resource-form').addEventListener('submit', addResource);
+    document.getElementById('admin-user-form').addEventListener('submit', addAdminUser);
     document.getElementById('schedule-file').addEventListener('change', uploadSchedule);
 
     const { data: { session } } = await client.auth.getSession();
@@ -53,16 +54,18 @@ async function signOut() {
 }
 
 async function refreshDashboard() {
-    const [settingsResult, linksResult, resourcesResult] = await Promise.all([
+    const [settingsResult, linksResult, resourcesResult, adminsResult] = await Promise.all([
         client.from('site_settings').select('*').eq('id', 1).single(),
         client.from('quick_links').select('*').order('sort_order'),
-        client.from('resources').select('*').order('section').order('sort_order')
+        client.from('resources').select('*').order('section').order('sort_order'),
+        client.from('admin_user_emails').select('*').order('email')
     ]);
-    if (settingsResult.error || linksResult.error || resourcesResult.error) return showMessage(dashboardMessage, 'Не удалось загрузить данные панели.', true);
+    if (settingsResult.error || linksResult.error || resourcesResult.error || adminsResult.error) return showMessage(dashboardMessage, 'Не удалось загрузить данные панели.', true);
     settings = settingsResult.data;
     fillSettingsForm(settings);
     renderQuickLinksAdmin(linksResult.data || []);
     renderResourcesAdmin(resourcesResult.data || []);
+    renderAdminUsersAdmin(adminsResult.data || []);
 }
 
 function fillSettingsForm(data) {
@@ -108,6 +111,20 @@ async function addResource(event) {
     showMessage(dashboardMessage, 'Ресурс добавлен.');
 }
 
+async function addAdminUser(event) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const email = String(form.get('email') || '').trim();
+    if (!email) return showMessage(dashboardMessage, 'Укажите email пользователя.', true);
+
+    const { data, error } = await client.rpc('add_admin_by_email', { p_email: email });
+    if (error) return showMessage(dashboardMessage, error.message, true);
+
+    event.currentTarget.reset();
+    await refreshDashboard();
+    showMessage(dashboardMessage, data === 'ok' ? 'Пользователь добавлен в список администраторов.' : 'Пользователь уже есть в списке администраторов.');
+}
+
 function renderQuickLinksAdmin(items) {
     document.getElementById('quick-links-list').innerHTML = items.map((item) => `<div class="admin-list-item"><div><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.href)}</small></div><button class="button" type="button" data-delete-link="${item.id}">Удалить</button></div>`).join('') || '<p class="admin-muted">Ссылок пока нет.</p>';
     document.querySelectorAll('[data-delete-link]').forEach((button) => button.addEventListener('click', () => deleteRecord('quick_links', button.dataset.deleteLink)));
@@ -116,6 +133,19 @@ function renderQuickLinksAdmin(items) {
 function renderResourcesAdmin(items) {
     document.getElementById('resources-list').innerHTML = items.map((item) => `<div class="admin-list-item"><div><strong>${escapeHtml(item.name)} <small>(${escapeHtml(item.section)})</small></strong><small>${escapeHtml(item.url || 'Ссылка не добавлена')}</small></div><button class="button" type="button" data-delete-resource="${item.id}">Удалить</button></div>`).join('') || '<p class="admin-muted">Ресурсов пока нет.</p>';
     document.querySelectorAll('[data-delete-resource]').forEach((button) => button.addEventListener('click', () => deleteRecord('resources', button.dataset.deleteResource)));
+}
+
+function renderAdminUsersAdmin(items) {
+    document.getElementById('admins-list').innerHTML = items.map((item) => `<div class="admin-list-item"><div><strong>${escapeHtml(item.email)}</strong></div><button class="button" type="button" data-remove-admin="${item.user_id}">Удалить</button></div>`).join('') || '<p class="admin-muted">Администраторов пока нет.</p>';
+    document.querySelectorAll('[data-remove-admin]').forEach((button) => button.addEventListener('click', () => removeAdminUser(button.dataset.removeAdmin)));
+}
+
+async function removeAdminUser(userId) {
+    if (!window.confirm('Снять права администратора у этого пользователя?')) return;
+    const { error } = await client.rpc('remove_admin_by_id', { p_user_id: userId });
+    if (error) return showMessage(dashboardMessage, error.message, true);
+    await refreshDashboard();
+    showMessage(dashboardMessage, 'Права администратора сняты.');
 }
 
 async function deleteRecord(table, id) {

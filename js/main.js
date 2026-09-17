@@ -44,7 +44,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('schedule-open-link').href = scheduleUrl;
         document.getElementById('schedule-download-link').href = scheduleUrl;
     }
-    if (activePage === 'zoom') renderResources('zoom-list', siteData.resources.zoom, 'Zoom', 'Открыть Zoom', 'Ссылки Zoom пока не добавлены.');
+    if (activePage === 'zoom') {
+        const zoomItems = Array.isArray(window.zoomLessons) && window.zoomLessons.length ? window.zoomLessons : siteData.resources.zoom;
+        renderResources('zoom-list', zoomItems, 'Zoom', 'Открыть Zoom', 'Ссылки Zoom пока не добавлены.');
+    }
     if (activePage === 'classroom') renderResources('classroom-list', siteData.resources.classroom, 'Google Classroom', 'Открыть Classroom', 'Ссылки Classroom пока не добавлены.');
     if (activePage === 'telegram') renderResources('telegram-list', siteData.resources.telegram, 'Telegram', 'Открыть Телеграмм', 'Ссылки Telegram пока не добавлены.');
 

@@ -37,6 +37,11 @@ create table public.admin_users (
     user_id uuid primary key references auth.users(id) on delete cascade
 );
 
+create view public.admin_user_emails as
+select a.user_id, u.email
+from public.admin_users a
+join auth.users u on u.id = a.user_id;
+
 insert into public.site_settings (id) values (1) on conflict (id) do nothing;
 
 alter table public.site_settings enable row level security;
@@ -48,13 +53,61 @@ create or replace function public.is_admin() returns boolean language sql securi
     select exists (select 1 from public.admin_users where user_id = auth.uid());
 $$;
 
+create or replace function public.add_admin_by_email(p_email text)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    v_user_id uuid;
+begin
+    if not public.is_admin() then
+        raise exception 'Только администратор может назначать права.';
+    end if;
+
+    select id into v_user_id
+    from auth.users
+    where lower(email) = lower(trim(p_email))
+    limit 1;
+
+    if v_user_id is null then
+        raise exception 'Пользователь с таким email не найден в системе.';
+    end if;
+
+    insert into public.admin_users (user_id)
+    values (v_user_id)
+    on conflict (user_id) do nothing;
+
+    return 'ok';
+end;
+$$;
+
+create or replace function public.remove_admin_by_id(p_user_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+    if not public.is_admin() then
+        raise exception 'Только администратор может снимать права.';
+    end if;
+
+    delete from public.admin_users
+    where user_id = p_user_id
+      and user_id <> auth.uid();
+end;
+$$;
+
 create policy "Public can read settings" on public.site_settings for select using (true);
 create policy "Admins can edit settings" on public.site_settings for all using (public.is_admin()) with check (public.is_admin());
 create policy "Public can read links" on public.quick_links for select using (true);
 create policy "Admins can edit links" on public.quick_links for all using (public.is_admin()) with check (public.is_admin());
 create policy "Public can read resources" on public.resources for select using (true);
 create policy "Admins can edit resources" on public.resources for all using (public.is_admin()) with check (public.is_admin());
-create policy "Admins can read admin list" on public.admin_users for select using (public.is_admin());
+create policy "Admins can manage admin list" on public.admin_users for all using (public.is_admin()) with check (public.is_admin());
+create policy "Admins can read admin emails" on public.admin_user_emails for select using (public.is_admin());
 
 insert into storage.buckets (id, name, public) values ('schedule-pdfs', 'schedule-pdfs', true) on conflict (id) do nothing;
 create policy "Public can read schedule files" on storage.objects for select using (bucket_id = 'schedule-pdfs');
