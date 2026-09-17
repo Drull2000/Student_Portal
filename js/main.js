@@ -1,26 +1,13 @@
-const PORTAL_CONFIG = {
-    portalName: 'Компьютерная Инженерия',
-    specialty: 'Компьютерная Инженерия',
-    group: 'КИ-21',
-    // Вставьте сюда ссылку Google Docs с доступом "Все, у кого есть ссылка — читатель".
-    googleDocsUrl: 'https://docs.google.com/spreadsheets/d/1DXo_Kz-FPiFVTzYuLtD39iGJaU4rSoae/edit?usp=sharing&ouid=103262135116944635122&rtpof=true&sd=true'
-};
-
-const quickLinks = [
-    { logo: 'https://cdn.simpleicons.org/googlesheets/34A853', title: 'Таблица пропусков', button: 'Открыть таблицу', description: 'Открыть таблицу пропусков группы.', href: 'schedule.html' },
-    { logo: 'https://cdn.simpleicons.org/zoom/2D8CFF', title: 'Zoom', button: 'Открыть Zoom', description: 'Ссылки на онлайн-занятия в Zoom.', href: 'zoom.html' },
-    { logo: 'https://cdn.simpleicons.org/googleclassroom/0F9D58', title: 'Google Classroom', button: 'Открыть Classroom', description: 'Онлайн-занятия и учебные материалы.', href: 'classroom.html' },
-    { logo: 'https://cdn.simpleicons.org/telegram/229ED9', title: 'Группа в Telegram', button: 'Открыть группу', description: 'Общение и важные объявления группы.', href: 'https://t.me/+4MD5h8O5blszYThi', external: true }
-];
-
 document.body.classList.add('page-loading');
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    const siteData = await loadSiteData();
+    const settings = siteData.settings;
     preparePageTransitions();
 
-    document.querySelectorAll('[data-portal-name]').forEach((element) => element.textContent = PORTAL_CONFIG.portalName);
-    document.querySelectorAll('[data-specialty]').forEach((element) => element.textContent = PORTAL_CONFIG.specialty);
-    document.querySelectorAll('[data-group]').forEach((element) => element.textContent = PORTAL_CONFIG.group);
+    document.querySelectorAll('[data-portal-name]').forEach((element) => element.textContent = settings.portal_name);
+    document.querySelectorAll('[data-specialty]').forEach((element) => element.textContent = settings.specialty);
+    document.querySelectorAll('[data-group]').forEach((element) => element.textContent = settings.group_name);
 
     const activePage = document.body.dataset.page;
     const activeLink = document.querySelector(`[data-nav="${activePage}"]`);
@@ -40,17 +27,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.querySelectorAll('[data-google-docs-link]').forEach((link) => {
-        if (PORTAL_CONFIG.googleDocsUrl === 'YOUR_GOOGLE_DOCS_URL') {
+        if (!settings.google_docs_url) {
             link.addEventListener('click', (event) => event.preventDefault());
             link.classList.add('disabled-link');
             link.setAttribute('aria-disabled', 'true');
         } else {
-            link.href = PORTAL_CONFIG.googleDocsUrl;
+            link.href = settings.google_docs_url;
         }
     });
 
-    if (activePage === 'schedule') setupDocsViewer();
-    if (activePage === 'home') renderQuickLinks();
+    if (activePage === 'schedule') setupDocsViewer(settings.google_docs_url);
+    if (activePage === 'home') {
+        renderQuickLinks(siteData.quickLinks);
+        const scheduleUrl = settings.schedule_pdf_url || 'assets/schedule.pdf?v=3';
+        document.getElementById('schedule-frame').src = scheduleUrl;
+        document.getElementById('schedule-open-link').href = scheduleUrl;
+        document.getElementById('schedule-download-link').href = scheduleUrl;
+    }
+    if (activePage === 'zoom') renderResources('zoom-list', siteData.resources.zoom, 'Zoom', 'Открыть Zoom', 'Ссылки Zoom пока не добавлены.');
+    if (activePage === 'classroom') renderResources('classroom-list', siteData.resources.classroom, 'Google Classroom', 'Открыть Classroom', 'Ссылки Classroom пока не добавлены.');
+    if (activePage === 'telegram') renderResources('telegram-list', siteData.resources.telegram, 'Telegram', 'Открыть Телеграмм', 'Ссылки Telegram пока не добавлены.');
+
+    subscribeToSiteChanges(() => {
+        window.clearTimeout(window.siteReloadTimer);
+        window.siteReloadTimer = window.setTimeout(() => window.location.reload(), 450);
+    });
 
     requestAnimationFrame(() => {
         document.body.classList.remove('page-loading');
@@ -84,7 +85,7 @@ function preparePageTransitions() {
     });
 }
 
-function renderQuickLinks() {
+function renderQuickLinks(quickLinks) {
     const container = document.getElementById('quick-links');
     if (!container) return;
     container.innerHTML = quickLinks.map((link) => `
@@ -92,21 +93,21 @@ function renderQuickLinks() {
             <span class="card-icon"><img class="card-logo" src="${link.logo}" alt="Логотип ${link.title}"></span>
             <h3>${link.title}</h3>
             <p>${link.description}</p>
-            <a class="button" href="${link.href}"${link.external ? ' target="_blank" rel="noopener noreferrer"' : ''}>${link.button}</a>
+            <a class="button" href="${link.href}"${link.is_external ? ' target="_blank" rel="noopener noreferrer"' : ''}>${link.button_text}</a>
         </article>
     `).join('');
 }
 
-function setupDocsViewer() {
+function setupDocsViewer(googleDocsUrl) {
     const frame = document.getElementById('docs-frame');
     const fallback = document.getElementById('docs-fallback');
-    if (!frame || !fallback || PORTAL_CONFIG.googleDocsUrl === 'YOUR_GOOGLE_DOCS_URL') {
+    if (!frame || !fallback || !googleDocsUrl) {
         if (frame) frame.hidden = true;
         fallback.hidden = false;
         return;
     }
 
-    frame.src = getDocsPreviewUrl(PORTAL_CONFIG.googleDocsUrl);
+    frame.src = getDocsPreviewUrl(googleDocsUrl);
     frame.addEventListener('error', () => {
         frame.hidden = true;
         fallback.hidden = false;

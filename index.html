@@ -6,6 +6,9 @@
 	<meta name="description" content="Чисто для своих.">
 	<title>Компьютерная Инженерия 21 группа</title>
 	<link rel="stylesheet" href="css/style.css">
+	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+	<script src="js/supabase-config.js"></script>
+	<script src="js/site-data.js"></script>
 	<script src="js/main.js" defer></script>
 </head>
 <body data-page="home">
@@ -18,6 +21,7 @@
 				<a href="schedule.html" data-nav="schedule">Таблица пропусков</a>
 				<a href="zoom.html" data-nav="zoom">Zoom</a>
 				<a href="classroom.html" data-nav="classroom">Google Classroom</a>
+				<a href="admin.html">Админ-панель</a>
 			</nav>
 		</div>
 	</header>
@@ -41,15 +45,15 @@
 		<section class="status-strip" aria-label="Статус портала">
 			<div><span class="status-label">Группа</span><strong data-group>КИ-21</strong></div>
 			<div><span class="status-label">Таблица</span><strong>Только просмотр</strong></div>
-			<div><span class="status-label">Обновлено</span><strong>17.09.26</strong></div>
+			<div><span class="status-label">Обновлено</span><strong>11.09.26</strong></div>
 		</section>
 
 		<section aria-labelledby="schedule-title">
-			<div class="section-heading"><h2 id="schedule-title">Текущее расписание</h2><span class="eyebrow">Обновлено от 17.09.26</span></div>
-			<div class="schedule-panel"><iframe src="assets/schedule.pdf?v=3" title="Текущее расписание занятий" loading="lazy"></iframe></div>
+			<div class="section-heading"><h2 id="schedule-title">Текущее расписание</h2><span class="eyebrow">Обновлено от 13.09.26</span></div>
+			<div class="schedule-panel"><iframe id="schedule-frame" src="assets/schedule.pdf?v=3" title="Текущее расписание занятий" loading="lazy"></iframe></div>
 			<div class="panel-actions">
-				<a class="button button-primary" href="assets/schedule.pdf?v=3" target="_blank" rel="noopener noreferrer">Открыть полное расписание</a>
-				<a class="button" href="assets/schedule.pdf?v=3" download="schedule.pdf">Скачать PDF</a>
+				<a id="schedule-open-link" class="button button-primary" href="assets/schedule.pdf?v=3" target="_blank" rel="noopener noreferrer">Открыть полное расписание</a>
+				<a id="schedule-download-link" class="button" href="assets/schedule.pdf?v=3" download="schedule.pdf">Скачать PDF</a>
 			</div>
 		</section>
 

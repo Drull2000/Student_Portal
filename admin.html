@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель | Компьютерная Инженерия</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/site-data.js"></script>
+    <script src="js/admin.js" defer></script>
+</head>
+<body class="admin-page">
+    <main class="admin-shell">
+        <section id="login-view" class="admin-auth-panel">
+            <p class="eyebrow">Управление сайтом</p>
+            <h1>Вход администратора</h1>
+            <p class="admin-muted">Изменения сразу сохраняются в Supabase и становятся доступны посетителям.</p>
+            <form id="login-form" class="admin-form">
+                <label>Email<input name="email" type="email" autocomplete="email" required></label>
+                <label>Пароль<input name="password" type="password" autocomplete="current-password" required></label>
+                <button class="button button-primary" type="submit">Войти</button>
+            </form>
+            <p id="login-message" class="admin-message" role="status"></p>
+        </section>
+
+        <section id="dashboard-view" hidden>
+            <header class="admin-topbar">
+                <div><p class="eyebrow">Панель управления</p><h1>Сайт группы</h1></div>
+                <div class="admin-topbar-actions"><span id="admin-email" class="admin-muted"></span><button id="logout-button" class="button" type="button">Выйти</button></div>
+            </header>
+            <p id="dashboard-message" class="admin-message" role="status"></p>
+
+            <section class="admin-section">
+                <div class="admin-section-heading"><div><p class="eyebrow">Основные данные</p><h2>Настройки сайта</h2></div></div>
+                <form id="settings-form" class="admin-form admin-grid-form">
+                    <label>Название портала<input name="portal_name" required></label>
+                    <label>Специальность<input name="specialty" required></label>
+                    <label>Группа<input name="group_name" required></label>
+                    <label>Ссылка на Google Sheets<input name="google_docs_url" type="url"></label>
+                    <label class="admin-wide">Ссылка на PDF расписания<input name="schedule_pdf_url" type="url"></label>
+                    <div class="admin-wide admin-form-actions"><button class="button button-primary" type="submit">Сохранить настройки</button><label class="file-button">Загрузить новый PDF<input id="schedule-file" type="file" accept="application/pdf"></label></div>
+                </form>
+            </section>
+
+            <section class="admin-section">
+                <div class="admin-section-heading"><div><p class="eyebrow">Главная страница</p><h2>Быстрый доступ</h2></div></div>
+                <div id="quick-links-list" class="admin-list"></div>
+                <form id="quick-link-form" class="admin-form admin-grid-form admin-add-form">
+                    <input name="title" placeholder="Название" required><input name="description" placeholder="Описание" required><input name="button_text" placeholder="Текст кнопки" value="Открыть" required><input name="href" type="url" placeholder="Ссылка" required><input name="logo" type="url" placeholder="URL логотипа"><button class="button button-primary" type="submit">Добавить ссылку</button>
+                </form>
+            </section>
+
+            <section class="admin-section">
+                <div class="admin-section-heading"><div><p class="eyebrow">Разделы сайта</p><h2>Занятия и группы</h2></div></div>
+                <div id="resources-list" class="admin-list"></div>
+                <form id="resource-form" class="admin-form admin-grid-form admin-add-form">
+                    <select name="section" aria-label="Раздел"><option value="zoom">Zoom</option><option value="classroom">Google Classroom</option><option value="telegram">Telegram</option></select><input name="name" placeholder="Название" required><input name="teacher" placeholder="Преподаватель"><input name="description" placeholder="Описание" required><input name="url" type="url" placeholder="Ссылка"><button class="button button-primary" type="submit">Добавить ресурс</button>
+                </form>
+            </section>
+        </section>
+    </main>
+</body>
+</html>
